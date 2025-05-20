@@ -148,35 +148,39 @@ SELECT *
 FROM practise_staging2
 WHERE industry = '' OR industry IS NULL;
 
--- since we have found that the multi
+-- since we have found that the empty spaces we are filling them will null.
 UPDATE practise_staging2
 SET industry = NULL
 WHERE industry = '';
 
-
+-- Checking is Bally has any duplicate entry with industry
 SELECT *
 FROM practise_staging2
 WHERE company LIKE 'Bally%';
 
+-- Updating the industry based on the other entries of same company name
 UPDATE practise_staging2 ps1
 	JOIN practise_staging2 ps2
 	ON ps1.company = ps2.company
 SET ps1.industry = ps2.industry
 WHERE ps1.industry IS NULL AND ps2.industry IS NOT NULL;
 
-
+-- Extracting the rows with both total laid off and percentage laid off
 SELECT *
 FROM practise_staging2
 WHERE total_laid_off IS NULL AND percentage_laid_off IS NULL;
 
+-- As these are the important metric that we are mainly analyzing here is both are absent 
+-- then that row is sort of useless so we are dropping them
 DELETE FROM practise_staging2
 WHERE total_laid_off IS NULL AND percentage_laid_off IS NULL;
 
+-- droping the row_num to reduce the calculation cost as we are done with its use
 ALTER TABLE practise_staging2
 DROP COLUMN row_num;
 
+-- Checking the final refined data
 SELECT *
 FROM practise_staging2;
-
 
 
